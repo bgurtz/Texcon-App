@@ -1,0 +1,12 @@
+
+:root{
+  --texcon-red:#c1121f;
+  --ink:#111827;
+  --muted:#6b7280;
+}
+
+body { color: var(--ink); }
+.texcon-red { color: var(--texcon-red); }
+.card-soft { border: 0; border-radius: 18px; }
+.btn { border-radius: 14px; }
+.form-control-lg { border-radius: 14px; }
