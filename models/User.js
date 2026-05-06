@@ -1,6 +1,8 @@
-
 const mongoose = require("mongoose");
 
+/* =========================
+   Pay Rate History Schema
+========================= */
 const PayRateSchema = new mongoose.Schema(
   {
     rate: { type: Number, required: true },
@@ -9,9 +11,16 @@ const PayRateSchema = new mongoose.Schema(
   { _id: false }
 );
 
+/* =========================
+   User Schema
+========================= */
 const UserSchema = new mongoose.Schema(
   {
-    role: { type: String, enum: ["driver", "admin"], required: true },
+    role: {
+      type: String,
+      enum: ["driver", "admin"],
+      required: true
+    },
 
     username: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
@@ -19,6 +28,15 @@ const UserSchema = new mongoose.Schema(
     firstName: { type: String, default: "" },
     lastName: { type: String, default: "" },
     phone: { type: String, default: "" },
+
+    // Legacy / display-only current rate
+    hourlyRate: { type: Number, default: 0 },
+
+    // ✅ Correct pay-rate history (used for payroll math)
+    payRates: {
+      type: [PayRateSchema],
+      default: []
+    },
 
     active: { type: Boolean, default: true },
     hireDate: { type: Date },
@@ -30,7 +48,16 @@ const UserSchema = new mongoose.Schema(
     trailerNumber: { type: String, default: "" },
     truckType: {
       type: String,
-      enum: ["", "Bobtail", "Belly Dump", "Super Dump", "End Dump", "Oil Truck", "Water Truck", "Haul Truck"],
+      enum: [
+        "",
+        "Bobtail",
+        "Belly Dump",
+        "Super Dump",
+        "End Dump",
+        "Oil Truck",
+        "Water Truck",
+        "Haul Truck"
+      ],
       default: ""
     },
 
@@ -38,8 +65,6 @@ const UserSchema = new mongoose.Schema(
     dlExp: { type: Date },
 
     photoPath: { type: String, default: "" },
-
-    payRates: { type: [PayRateSchema], default: [] },
 
     vacationDays: { type: Number, default: 0 },
     timeOffDays: { type: Number, default: 0 },
