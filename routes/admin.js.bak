@@ -1,0 +1,83 @@
+// @ts-nocheck
+const express = require("express");
+const bcrypt = require("bcrypt");
+const User = require("../models/User");
+
+const router = express.Router();
+
+function requireAdmin(req, res) {
+  if (!req.session || req.session.role !== "admin") {
+    return res.redirect("/login");
+  }
+  return true;
+}
+
+/* Admin dashboard */
+router.get("/", (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  res.render("admin/dashboard");
+});
+
+/* Driver list with filters */
+router.get("/drivers", async (req, res) => {
+  if (!requireAdmin(req, res)) return;
+
+  const q = req.query.q;
+  const status = req.query.status;
+
+  const filter = { role: "driver" };
+  if (status) filter.status = status;
+  if (q) {
+    filter.$or = [
+      { firstName: new RegExp(q, "i") },
+      { lastName: new RegExp(q, "i") },
+      { username: new RegExp(q, "i") }
+    ];
+  }
+
+  const drivers = await User.find(filter).sort({ lastName: 1 });
+  res.render("admin/drivers", { drivers, q, status });
+});
+
+/* Edit driver */
+router.get("/drivers/:id/edit", async (req, res) => {
+  if (!requireAdmin(req, res)) return;
+  const driver = await User.findById(req.params.id);
+  res.render("admin/edit-driver", { driver });
+});
+
+/* Update driver */
+router.post("/drivers/:id/update", async (req, res) => {
+  if (!requireAdmin(req, res)) return;
+
+  const updates = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    truckType: req.body.truckType,
+    truckNumber: req.body.truckNumber,
+    trailerNumber: req.body.trailerNumber,
+    yard: req.body.yard,
+    driverNote: req.body.driverNote,
+    status: req.body.status,
+    eligibleForRehire: req.body.eligibleForRehire === "on",
+    active: req.body.status === "active"
+  };
+
+  const ops = { $set: updates };
+
+  if (req.body.hourlyRate) {
+    const rate = Number(req.body.hourlyRate);
+    const today = new Date(); today.setHours(0,0,0,0);
+    updates.hourlyRate = rate;
+    ops.$push = { payRates: { rate, effectiveDate: today } };
+  }
+
+  if (req.body.newPassword) {
+    updates.passwordHash = await bcrypt.hash(req.body.newPassword, 12);
+  }
+
+  await User.findByIdAndUpdate(req.params.id, ops);
+  res.redirect("/admin/drivers");
+});
+
+module.exports = router;

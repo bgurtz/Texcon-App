@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weekly Timesheet</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  >
+
+  <style>
+    @media print {
+      .no-print { display: none; }
+    }
+    table th, table td {
+      text-align: center;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Weekly Timesheet</h4>
+
+    <div class="no-print">
+      <a href="/driver" class="btn btn-outline-secondary me-2">← Back</a>
+      <a href="/driver/timesheet/week/print" class="btn btn-primary">Print</a>
+    </div>
+  </div>
+
+  <!-- Driver / Week Info -->
+  <div class="mb-3">
+    <strong>Driver:</strong>
+    <%= driver.firstName %> <%= driver.lastName %><br>
+    <strong>Week:</strong>
+    <%= weekStart.toLocaleDateString() %> –
+    <%= weekEnd.toLocaleDateString() %>
+  </div>
+
+  <!-- Timesheet Table -->
+  <table class="table table-bordered table-sm">
+    <thead class="table-light">
+      <tr>
+        <th>Day</th>
+        <th>Date</th>
+        <th>Clock In</th>
+        <th>Clock Out</th>
+        <th>Lunch</th>
+        <th>Paid Hours</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% for (var i = 0; i < days.length; i++) { %>
+        <tr>
+          <td>
+            <%= days[i].date.toLocaleDateString(undefined, { weekday: "long" }) %>
+          </td>
+          <td>
+            <%= days[i].date.toLocaleDateString() %>
+          </td>
+          <td>
+            <%= days[i].clockIn ? days[i].clockIn.toLocaleTimeString() : "" %>
+          </td>
+          <td>
+            <%= days[i].clockOut ? days[i].clockOut.toLocaleTimeString() : "" %>
+          </td>
+          <td>
+            <%= days[i].lunchDeducted ? "30 min" : "" %>
+          </td>
+          <td>
+            <%= days[i].paidHours.toFixed(2) %>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+
+    <tfoot>
+      <tr>
+        <th colspan="5" class="text-end">Regular Hours</th>
+        <th><%= regularHours.toFixed(2) %></th>
+      </tr>
+      <tr>
+        <th colspan="5" class="text-end">Overtime Hours</th>
+        <th><%= overtimeHours.toFixed(2) %></th>
+      </tr>
+      <tr>
+        <th colspan="5" class="text-end">Total Hours</th>
+        <th><%= totalHours.toFixed(2) %></th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="mt-3 text-muted small">
+    * Lunch is automatically deducted by 30 minutes for shifts over 6.5 hours.<br>
+    * Time is rounded using the 7‑minute (quarter‑hour) rule.
+  </div>
+
+</div>
+</body>
+</html>

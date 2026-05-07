@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,136 +15,115 @@
 <body class="bg-light">
 <div class="container py-4">
 
-  <a href="/admin/drivers">&larr; Back</a>
-  <h3 class="mt-2">Edit Driver</h3>
+  <!-- Back button (OUTSIDE form) -->
+  <a href="/admin/drivers" class="btn btn-link mb-3">← Back to Drivers</a>
 
-  <!-- ✅ REAL FORM -->
-  <form
-    method="POST"
-    action="/admin/drivers/<%= driver._id %>/update"
-  >
+  <h3 class="mb-3">Edit Driver</h3>
 
-    <div class="row g-3">
+  <form method="POST" action="/admin/drivers/<%= driver._id %>/update">
 
-      <div class="col-md-4">
-        <label class="form-label">First Name</label>
-        <input
-          class="form-control"
-          name="firstName"
-          value="<%= driver.firstName %>"
-        >
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label">Last Name</label>
-        <input
-          class="form-control"
-          name="lastName"
-          value="<%= driver.lastName %>"
-        >
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label">Current Hourly Rate ($)</label>
-        <input
-          class="form-control"
-          type="number"
-          step="0.01"
-          value="<%= driver.hourlyRate || 0 %>"
-          disabled
-        >
-      </div>
-
-    </div>
-
-    <hr>
-
-    <h5>Pay Rate History</h5>
-
-    <ul class="list-group mb-3">
-      <% (driver.payRates || []).forEach(p => { %>
-        <li class="list-group-item d-flex justify-content-between">
-          <span>
-            $<%= p.rate.toFixed(2) %>/hr
-            (Effective <%= p.effectiveDate.toISOString().slice(0,10) %>)
-          </span>
-        </li>
-      <% }) %>
-    </ul>
-
-    <h6>Add New Rate / Schedule Raise</h6>
-
-    <div class="row g-2 mb-4">
-      <div class="col-md-4">
-        <input
-          name="newRate"
-          class="form-control"
-          placeholder="New Hourly Rate ($)"
-          type="number"
-          step="0.01"
-        >
-      </div>
-
-      <div class="col-md-4">
-        <input
-          name="effectiveDate"
-          class="form-control"
-          type="date"
-        >
-      </div>
-    </div>
-
-    <div class="row g-3">
-
-      <div class="col-md-4">
-        <label class="form-label">Truck Type</label>
-        <select class="form-select" name="truckType">
-          <option value="">Truck Type</option>
-          <% [
-            "Bobtail",
-            "Belly Dump",
-            "Super Dump",
-            "End Dump",
-            "Oil Truck",
-            "Water Truck",
-            "Haul Truck"
-          ].forEach(t => { %>
-            <option
-              value="<%= t %>"
-              <%= driver.truckType === t ? "selected" : "" %>
-            >
-              <%= t %>
-            </option>
-          <% }) %>
-        </select>
-      </div>
-
-      <div class="col-md-4">
-        <label class="form-label">Truck #</label>
-        <input
-          class="form-control"
-          name="truckNumber"
-          value="<%= driver.truckNumber %>"
-        >
-      </div>
-
-      <div class="col-md-4 d-flex align-items-center">
-        <div class="form-check mt-4">
-          <input
-            type="checkbox"
-            class="form-check-input"
-            name="active"
-            <%= driver.active ? "checked" : "" %>
-          >
-          <label class="form-check-label">Active</label>
+    <!-- DRIVER INFO -->
+    <div class="card p-3 mb-3">
+      <h5>Driver Info</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label>First Name</label>
+          <input name="firstName" class="form-control" value="<%= driver.firstName %>">
+        </div>
+        <div class="col-md-4">
+          <label>Last Name</label>
+          <input name="lastName" class="form-control" value="<%= driver.lastName %>">
         </div>
       </div>
-
     </div>
 
-    <button class="btn btn-dark mt-4">
-      Save Changes
-    </button>
+    <!-- EQUIPMENT -->
+    <div class="card p-3 mb-3">
+      <h5>Equipment</h5>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label>Truck Type</label>
+          <select name="truckType" class="form-select">
+            <% ["","Bobtail","Belly Dump","Super Dump","End Dump","Oil Truck","Water Truck","Haul Truck"]
+              .forEach(t => { %>
+              <option value="<%= t %>" <%= driver.truckType === t ? "selected" : "" %>>
+                <%= t || "Select Truck Type" %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label>Truck #</label>
+          <input name="truckNumber" class="form-control" value="<%= driver.truckNumber || "" %>">
+        </div>
+
+        <div class="col-md-3">
+          <label>Trailer #</label>
+          <input name="trailerNumber" class="form-control" value="<%= driver.trailerNumber || "" %>">
+        </div>
+
+        <div class="col-md-3">
+          <label>Yard</label>
+          <input name="yard" class="form-control" value="<%= driver.yard || "" %>">
+        </div>
+      </div>
+    </div>
+
+    <!-- PAY -->
+    <div class="card p-3 mb-3">
+      <h5>Current Pay</h5>
+      <label>Current Hourly Rate ($)</label>
+      <input
+        name="hourlyRate"
+        type="number"
+        step="0.01"
+        class="form-control mb-2"
+        value="<%= driver.hourlyRate || 0 %>"
+      >
+      <small class="text-muted">Changing this applies immediately</small>
+    </div>
+
+    <!-- FUTURE RAISE -->
+    <div class="card p-3 mb-3">
+      <h5>Schedule Raise</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <input name="newRate" class="form-control" type="number" step="0.01" placeholder="New Hourly Rate">
+        </div>
+        <div class="col-md-4">
+          <input name="effectiveDate" class="form-control" type="date">
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPLOYMENT -->
+    <div class="card p-3 mb-3">
+      <h5>Employment</h5>
+
+      <label>Status</label>
+      <select name="status" class="form-select mb-2">
+        <option value="active" <%= driver.status === "active" ? "selected" : "" %>>Active</option>
+        <option value="resigned" <%= driver.status === "resigned" ? "selected" : "" %>>Resigned</option>
+        <option value="terminated" <%= driver.status === "terminated" ? "selected" : "" %>>Terminated</option>
+      </select>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" name="eligibleForRehire" <%= driver.eligibleForRehire ? "checked" : "" %>>
+        <label class="form-check-label">Eligible for Rehire</label>
+      </div>
+
+      <label>Admin Notes</label>
+      <textarea name="driverNote" class="form-control" rows="3"><%= (driver.driverNote || "").trim() %></textarea>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="card p-3 mb-3">
+      <h5>Reset Password</h5>
+      <input name="newPassword" type="password" class="form-control" placeholder="Leave blank to keep current password">
+    </div>
+
+    <button class="btn btn-dark">Save Changes</button>
 
   </form>
 

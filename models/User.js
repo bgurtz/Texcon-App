@@ -1,8 +1,5 @@
 const mongoose = require("mongoose");
 
-/* =========================
-   Pay Rate History Schema
-========================= */
 const PayRateSchema = new mongoose.Schema(
   {
     rate: { type: Number, required: true },
@@ -11,68 +8,42 @@ const PayRateSchema = new mongoose.Schema(
   { _id: false }
 );
 
-/* =========================
-   User Schema
-========================= */
 const UserSchema = new mongoose.Schema(
   {
-    role: {
-      type: String,
-      enum: ["driver", "admin"],
-      required: true
-    },
+    role: { type: String, enum: ["driver", "admin"], required: true },
 
     username: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
 
     firstName: { type: String, default: "" },
     lastName: { type: String, default: "" },
-    phone: { type: String, default: "" },
 
-    // Legacy / display-only current rate
-    hourlyRate: { type: Number, default: 0 },
-
-    // ✅ Correct pay-rate history (used for payroll math)
-    payRates: {
-      type: [PayRateSchema],
-      default: []
+    /* Employment */
+    status: {
+      type: String,
+      enum: ["active", "resigned", "terminated"],
+      default: "active"
     },
+    eligibleForRehire: { type: Boolean, default: true },
 
-    active: { type: Boolean, default: true },
-    hireDate: { type: Date },
-    separationDate: { type: Date },
-
-    driverNote: { type: String, default: "" },
-
+    /* Equipment */
+    truckType: { type: String, default: "" },
     truckNumber: { type: String, default: "" },
     trailerNumber: { type: String, default: "" },
-    truckType: {
-      type: String,
-      enum: [
-        "",
-        "Bobtail",
-        "Belly Dump",
-        "Super Dump",
-        "End Dump",
-        "Oil Truck",
-        "Water Truck",
-        "Haul Truck"
-      ],
-      default: ""
-    },
 
-    medCardExp: { type: Date },
-    dlExp: { type: Date },
+    /* Location */
+    yard: { type: String, default: "" },
 
-    photoPath: { type: String, default: "" },
+    /* Payroll */
+    hourlyRate: { type: Number, default: 0 },
+    payRates: { type: [PayRateSchema], default: [] },
 
-    vacationDays: { type: Number, default: 0 },
-    timeOffDays: { type: Number, default: 0 },
-    sickDays: { type: Number, default: 0 }
+    /* Admin Notes */
+    driverNote: { type: String, default: "" },
+
+    active: { type: Boolean, default: true }
   },
   { timestamps: true }
 );
-
-UserSchema.index({ lastName: 1, firstName: 1 });
 
 module.exports = mongoose.model("User", UserSchema);

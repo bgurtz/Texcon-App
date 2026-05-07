@@ -1,0 +1,15 @@
+﻿document.addEventListener("DOMContentLoaded", () => {
+  const inBtn = document.getElementById("clockInBtn");
+  const outBtn = document.getElementById("clockOutBtn");
+  const msg = document.getElementById("clockMsg");
+
+  if (inBtn) inBtn.onclick = () => send("/driver/clock-in");
+  if (outBtn) outBtn.onclick = () => send("/driver/clock-out");
+
+  async function send(url) {
+    msg.textContent = "Working…";
+    const res = await fetch(url, { method: "POST" });
+    const data = await res.json();
+    if (data.ok) location.reload();
+  }
+});

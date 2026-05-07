@@ -1,0 +1,32 @@
+﻿const express = require("express");
+const Timesheet = require("../models/Timesheet");
+const User = require("../models/User");
+const Settings = require("../models/Settings");
+const router = express.Router();
+
+function startOfToday() {
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+router.post("/clock-in", async (req, res) => {
+  const today = startOfToday();
+  await Timesheet.findOneAndUpdate(
+    { driverId: req.session.userId, workDate: today },
+    { $set: { clockIn: new Date() }, $setOnInsert: { driverId: req.session.userId, workDate: today } },
+    { upsert: true }
+  );
+  res.json({ ok: true });
+});
+
+router.post("/clock-out", async (req, res) => {
+  const today = startOfToday();
+  await Timesheet.findOneAndUpdate(
+    { driverId: req.session.userId, workDate: today },
+    { $set: { clockOut: new Date() } }
+  );
+  res.json({ ok: true });
+});
+
+module.exports = router;
