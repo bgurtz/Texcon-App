@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 const path = require("path");
 const express = require("express");
@@ -20,7 +19,6 @@ const app = express();
 (async () => {
   await connectDB(process.env.MONGO_URI);
 
-  // Ensure settings doc exists
   let settings = await Settings.findOne();
   if (!settings) {
     await Settings.create({
@@ -31,7 +29,6 @@ const app = express();
     });
   }
 
-  // Seed initial admin if none exist
   const adminExists = await User.exists({ role: "admin" });
   if (!adminExists) {
     const username = process.env.SEED_ADMIN_USERNAME || "Texcon2026";
@@ -67,9 +64,8 @@ const app = express();
   app.set("view engine", "ejs");
   app.set("views", path.join(__dirname, "views"));
 
-  app.use("/public", express.static(path.join(__dirname, "public")));
+  app.use(express.static(path.join(__dirname, "public")));
 
-  // locals for all views
   app.use(async (req, res, next) => {
     res.locals.session = req.session;
     res.locals.settings = await Settings.findOne();
